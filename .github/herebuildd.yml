@@ -1,0 +1,36 @@
+name: Compile with Nuitka
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@4
+
+      - name: Set up Python
+        uses: actions/setup-python@5
+        with:
+          python-version: '3.11'
+
+      - name: Install Nuitka and dependences
+        run: |
+          pip install -r requirements.txt
+          pip install nuitka zstandard
+
+      - name: Build Executable
+        run: python -m nuitka main.py --mode=onefile --enable-plugin=pyside6 --windows-console-mode=disable --output-filename=Trezvonilnik.exe --include-package=gtts --include-package=yt_dlp --include-module=sounddevice --jobs=1 --low-memory --assume-yes-for-downloads
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: executable-${{ matrix.os }}
+          path: |
+            *.exe
+            *.bin
+            main.dist/
+          
