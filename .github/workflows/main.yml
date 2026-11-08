@@ -10,27 +10,59 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install Nuitka and dependences
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev portaudio19-dev
+
+      - name: Install Nuitka and dependencies
         run: |
           pip install -r requirements.txt
           pip install nuitka zstandard
 
       - name: Build Executable
-        run: python -m nuitka main.py --mode=onefile --enable-plugin=pyside6 --windows-console-mode=disable --output-filename=Trezvonilnik.exe --include-package=gtts --include-package=yt_dlp --include-module=sounddevice --jobs=1 --low-memory --assume-yes-for-downloads
+        run: |
+          python -m nuitka main.py \
+            --onefile \
+            --enable-plugin=pyside6 \
+            --windows-console-mode=disable \
+            --include-package=gtts \
+            --include-package=yt_dlp \
+            --include-module=sounddevice \
+            --jobs=1 \
+            --low-memory \
+            --assume-yes-for-downloads
+
+      - name: Prepare Artifacts (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          if [ -f main.bin ]; then mv main.bin Trezvonilnik.bin; fi
+          if [ -f main.app ]; then mv main.app Trezvonilnik.app; fi
+        shell: bash
+
+      - name: Prepare Artifacts (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          if (Test-Path main.exe) { Rename-Item main.exe Trezvonilnik.exe }
+        shell: pwsh
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: executable-${{ matrix.os }}
+          name: Trezvonilnik-${{ matrix.os }}
           path: |
-            *.exe
-            *.bin
+            Trezvonilnik.exe
+            Trezvonilnik.bin
+            Trezvonilnik.app
             main.dist/
-          
+          if-no-files-found: warn
+
