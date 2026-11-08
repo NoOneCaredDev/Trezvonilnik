@@ -1,0 +1,12 @@
+PySide6>=6.6
+numpy>=1.26
+sounddevice>=0.4.6
+opuslib>=3.0.1
+opencv-python-headless>=4.9      # именно headless: полный opencv-python конфликтует с Qt-плагинами PySide6
+mss>=10.0
+Pillow>=10.0
+soundfile>=0.12
+imageio-ffmpeg>=0.4.9            # ffmpeg для музыкального бота и импорта звуков (mp3 и др.)
+yt-dlp>=2024.8                   # музыкальный бот: YouTube / SoundCloud / ...
+pygetwindow>=0.0.9; sys_platform == "win32"
+gTTS>=2.5.4                 # русская озвучка через Google Translate TTS
