@@ -31,16 +31,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          python -m nuitka main.py \
-            --onefile \
-            --enable-plugin=pyside6 \
-            --windows-console-mode=disable \
-            --include-package=gtts \
-            --include-package=yt_dlp \
-            --include-module=sounddevice \
-            --jobs=1 \
-            --low-memory \
-            --assume-yes-for-downloads
+          python -m nuitka main.py --onefile --enable-plugin=pyside6 --windows-console-mode=disable --include-package=gtts --include-package=yt_dlp --include-module=sounddevice --jobs=1 --low-memory --assume-yes-for-downloads
 
       - name: Prepare Artifacts (Linux/macOS)
         if: matrix.os != 'windows-latest'
